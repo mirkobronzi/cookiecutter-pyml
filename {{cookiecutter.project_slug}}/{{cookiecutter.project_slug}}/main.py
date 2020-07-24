@@ -45,6 +45,9 @@ def main():
 
     logging.basicConfig(level=logging.INFO)
 
+    if not os.path.exists(args.output):
+        os.makedirs(args.output)
+
     # will log to a file if provided (useful for orion on cluster)
     if args.log is not None:
         handler = logging.handlers.WatchedFileHandler(args.log)
@@ -84,9 +87,6 @@ def run(args, hyper_params):
         hyper_params (dict): hyper parameters from the config file
     """
     log_exp_details(os.path.realpath(__file__), args)
-
-    if not os.path.exists(args.output):
-        os.makedirs(args.output)
 
     # __TODO__ change the hparam that are used from the training algorithm
     # (and NOT the model - these will be specified in the model itself)
