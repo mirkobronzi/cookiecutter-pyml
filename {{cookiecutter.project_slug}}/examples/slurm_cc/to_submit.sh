@@ -13,4 +13,14 @@
 
 export MLFLOW_TRACKING_URI='mlruns'
 
-main --data ../data --output output --config config.yaml --disable-progressbar
+# We try to be cluster friendly:
+# we copy the data on the node local file system, run the exp, then copy the output back
+DATA="../data"
+OUTPUT="./output"
+
+echo "original data folder: $DATA"
+echo "output folder: $OUTPUT"
+
+rsync -avzq $DATA $SLURM_TMPDIR
+main --data ${SLURM_TMPDIR}/data --output ${SLURM_TMPDIR}/output --config config.yaml --disable-progressbar
+rsync -avzq ${SLURM_TMPDIR}/output $OUTPUT
