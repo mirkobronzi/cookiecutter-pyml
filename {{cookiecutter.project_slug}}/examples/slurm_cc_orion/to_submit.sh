@@ -16,7 +16,17 @@ export MLFLOW_TRACKING_URI='mlruns'
 export ORION_DB_ADDRESS='orion_db.pkl'
 export ORION_DB_TYPE='pickleddb'
 
+# We try to be cluster friendly:
+# we copy the data on the node local file system, run the trials.
+# for now, the output is written directly on the shared file system.
+
+DATA="../data"
+
+echo "original data folder: $DATA"
+
+rsync -avzq "$DATA/" "${SLURM_TMPDIR}/data"
+
 orion -v hunt --config orion_config.yaml \
-    main --data ../data --config config.yaml --disable-progressbar \
+    main --data "${SLURM_TMPDIR}/data" --config config.yaml --disable-progressbar \
     --output '{exp.working_dir}/{exp.name}_{trial.id}/' \
     --log '{exp.working_dir}/{exp.name}_{trial.id}/exp.log'
